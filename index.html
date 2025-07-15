@@ -18,8 +18,6 @@
   <script>
     async function fetchClaimUrl() {
       const res = await fetch('https://kanvas-proxy.onrender.com/claim-url');
-
-      );
       const json = await res.json();
       return json.url;
     }
@@ -41,3 +39,4 @@
   </script>
 </body>
 </html>
+
