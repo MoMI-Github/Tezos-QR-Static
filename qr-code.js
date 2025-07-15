@@ -1192,4 +1192,5 @@ function renderBmpUri(matrix, options) {
 
 
 // Comment-out the following line to convert this into a non-module .js file (e.g. for use in a <script src> tag over the file: protocol)
-export default QrCode
+window.QrCode = QrCode;
+
