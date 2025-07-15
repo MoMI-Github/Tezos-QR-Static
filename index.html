@@ -17,8 +17,8 @@
 
   <script>
     async function fetchClaimUrl() {
-      const res = await fetch(
-        'https://api.prod.kanvas.trili.tech/claim-url?campaignId=momi-x-melissa-wiederrecht&authKey=fd58d25269079cec142af70a320a7597'
+      const res = await fetch('https://kanvas-proxy.onrender.com/claim-url');
+
       );
       const json = await res.json();
       return json.url;
