@@ -13,68 +13,31 @@
 <body>
   <div id="qr-container">Loading QR code...</div>
 
-  <!-- Your QR code generator file -->
-  <script src="qr-code.js"></script> <!-- or whatever filename it has -->
+  <script src="qr-code.js"></script>
 
   <script>
-    // Make QrCode accessible if the generator used 'export default'
-    if (typeof QrCode === 'undefined' && typeof window !== 'undefined' && window.default) {
-      window.QrCode = window.default;
-    }
-
     async function fetchClaimUrl() {
-      const response = await fetch(
+      const res = await fetch(
         'https://api.prod.kanvas.trili.tech/claim-url?campaignId=momi-x-melissa-wiederrecht&authKey=fd58d25269079cec142af70a320a7597'
       );
-      if (!response.ok) {
-        throw new Error("Failed to fetch QR code URL");
-      }
-      const json = await response.json();
+      const json = await res.json();
       return json.url;
     }
 
-    async function updateQRCode() {
+    async function updateQrCode() {
       try {
         const url = await fetchClaimUrl();
         const matrix = QrCode.generate(url);
         const svg = QrCode.render('svg', matrix);
         document.getElementById('qr-container').innerHTML = svg;
-      } catch (error) {
-        console.error("QR code update failed:", error);
-        document.getElementById('qr-container').textContent = "Error loading QR code";
+      } catch (e) {
+        console.error('Error loading QR code:', e);
+        document.getElementById('qr-container').textContent = 'Error loading QR code';
       }
     }
 
-    updateQRCode(); // initial load
-    setInterval(updateQRCode, 30 * 1000); // refresh every 30 seconds
+    updateQrCode();                   // Initial load
+    setInterval(updateQrCode, 30000); // Refresh every 30 seconds
   </script>
-
-<div id="qr-container">Loading QR code...</div>
-
-<script src="qr-code.js"></script>
-<script>
-  async function fetchClaimUrl() {
-    const res = await fetch('https://api.prod.kanvas.trili.tech/claim-url?campaignId=momi-x-melissa-wiederrecht&authKey=fd58d25269079cec142af70a320a7597');
-    const json = await res.json();
-    return json.url;
-  }
-
-  async function updateQrCode() {
-    try {
-      const url = await fetchClaimUrl();
-      const matrix = QrCode.generate(url);
-      const svg = QrCode.render('svg', matrix);
-      document.getElementById('qr-container').innerHTML = svg;
-    } catch (e) {
-      console.error('Error loading QR code:', e);
-      document.getElementById('qr-container').textContent = 'Error loading QR code';
-    }
-  }
-
-  updateQrCode();                     // Load once on page load
-  setInterval(updateQrCode, 30000);   // Refresh every 30 seconds
-</script>
-
 </body>
 </html>
-
