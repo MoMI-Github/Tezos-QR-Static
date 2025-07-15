@@ -2,13 +2,52 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Scan Me</title>
+  <title>Dynamic QR Code</title>
   <style>
-    body { display:flex; align-items:center; justify-content:center; height:100vh; margin:0 }
-    img  { max-width:80vw; max-height:80vh; }
+    #qr-container {
+      width: 300px;
+      margin: 50px auto;
+    }
   </style>
 </head>
 <body>
-  <img src="qr.png" alt="Scan this QR code">
+  <div id="qr-container">Loading QR code...</div>
+
+  <!-- Your QR code generator file -->
+  <script src="qr-code.js"></script> <!-- or whatever filename it has -->
+
+  <script>
+    // Make QrCode accessible if the generator used 'export default'
+    if (typeof QrCode === 'undefined' && typeof window !== 'undefined' && window.default) {
+      window.QrCode = window.default;
+    }
+
+    async function fetchClaimUrl() {
+      const response = await fetch(
+        'https://api.prod.kanvas.trili.tech/claim-url?campaignId=momi-x-melissa-wiederrecht&authKey=fd58d25269079cec142af70a320a7597'
+      );
+      if (!response.ok) {
+        throw new Error("Failed to fetch QR code URL");
+      }
+      const json = await response.json();
+      return json.url;
+    }
+
+    async function updateQRCode() {
+      try {
+        const url = await fetchClaimUrl();
+        const matrix = QrCode.generate(url);
+        const svg = QrCode.render('svg', matrix);
+        document.getElementById('qr-container').innerHTML = svg;
+      } catch (error) {
+        console.error("QR code update failed:", error);
+        document.getElementById('qr-container').textContent = "Error loading QR code";
+      }
+    }
+
+    updateQRCode(); // initial load
+    setInterval(updateQRCode, 30 * 1000); // refresh every 30 seconds
+  </script>
 </body>
 </html>
+
