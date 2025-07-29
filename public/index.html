@@ -2,27 +2,49 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>QR Code Generator</title>
   <style>
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background-color: #fff;
+      font-family: sans-serif;
+    }
     #qr {
-      margin-top: 20px;
+      max-width: 90vmin;
     }
   </style>
 </head>
 <body>
-  <h1>QR Code Test</h1>
-  <div id="qr"></div>
+  <div id="qr">Loading QR code…</div>
 
-  <!-- Include your custom QR code library -->
-  <script src="qr-code.js"></script>
-
+  <script src="qrgen.js"></script>
   <script>
-    const matrix = QrCode.generate("https://example.com");
-    const svg = QrCode.render("svg", matrix);
-    document.getElementById("qr").innerHTML = svg;
+    async function updateQrCode() {
+      try {
+        const response = await fetch('/claim-url', { redirect: 'manual' });
+        const location = response.headers.get('Location');
+
+        if (!location) throw new Error('No redirect location found');
+
+        const matrix = QrCode.generate(location);
+        const svg = QrCode.render('svg', matrix);
+        document.getElementById('qr').innerHTML = svg;
+      } catch (err) {
+        console.error('Error loading QR code:', err);
+        document.getElementById('qr').textContent = 'Error loading QR code';
+      }
+    }
+
+    updateQrCode(); // initial load
+    setInterval(updateQrCode, 30000); // refresh every 30s
   </script>
 </body>
 </html>
+
 
 
 
