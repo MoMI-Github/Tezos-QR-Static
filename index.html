@@ -17,7 +17,7 @@
 
   <script>
     async function fetchClaimUrl() {
-      const res = await fetch('https://kanvas-proxy.onrender.com/claim-url');
+      const res = await fetch('/claim-url');
       const json = await res.json();
       return json.url;
     }
@@ -25,9 +25,14 @@
     async function updateQrCode() {
       try {
         const url = await fetchClaimUrl();
-        const matrix = QrCode.generate(url);
-        const svg = QrCode.render('svg', matrix);
-        document.getElementById('qr-container').innerHTML = svg;
+        const container = document.getElementById('qr-container');
+        container.innerHTML = '';
+
+        const qrcode = new QRCode(container, {
+          text: url,
+          width: 256,
+          height: 256
+        });
       } catch (e) {
         console.error('Error loading QR code:', e);
         document.getElementById('qr-container').textContent = 'Error loading QR code';
@@ -39,4 +44,5 @@
   </script>
 </body>
 </html>
+
 
