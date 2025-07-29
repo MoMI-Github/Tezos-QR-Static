@@ -1,19 +1,21 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>QR Code Generator</title>
+  <meta charset="UTF-8" />
+  <title>Live QR Code</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
       text-align: center;
-      margin-top: 40px;
+      font-family: sans-serif;
     }
     #qr-code-container {
       width: 200px;
       height: 200px;
-      margin: 0 auto;
-      overflow: hidden;
+      margin: 40px auto;
+    }
+    svg {
+      width: 100%;
+      height: 100%;
     }
   </style>
 </head>
@@ -21,28 +23,19 @@
   <h1>Live QR Code</h1>
   <div id="qr-code-container"></div>
 
-  <script src="qr-code.js"></script>
-  <script>
+  <script type="module">
+    import QrCode from './qr-code.js';
+
+    const container = document.getElementById('qr-code-container');
+
     function updateQrCode() {
-      try {
-        const now = Math.floor(Date.now() / 1000);
-        const currentSlot = Math.floor(now / 30);
-        const payload = `https://example.com/${currentSlot}`;
+      const now = Math.floor(Date.now() / 1000);
+      const slot = Math.floor(now / 30);
+      const url = `https://example.com/${slot}`;
 
-        const matrix = QrCode.generate(payload);
-        let svg = QrCode.render("svg", matrix);
-
-        // Make the SVG responsive within its container
-        svg = svg.replace(
-          /<svg([^>]+)>/,
-          '<svg$1 width="100%" height="100%" preserveAspectRatio="xMidYMid meet">'
-        );
-
-        const container = document.getElementById("qr-code-container");
-        container.innerHTML = svg;
-      } catch (error) {
-        console.error("Error updating QR code:", error);
-      }
+      const matrix = QrCode.generate(url);
+      const svg = QrCode.render('svg', matrix);
+      container.innerHTML = svg;
     }
 
     updateQrCode();
