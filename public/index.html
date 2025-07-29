@@ -7,11 +7,12 @@
     body {
       text-align: center;
       font-family: sans-serif;
+      background: #f7f7f7;
     }
     #qr-code-container {
       width: 200px;
       height: 200px;
-      margin: 40px auto;
+      margin: 50px auto;
     }
     svg {
       width: 100%;
@@ -20,22 +21,30 @@
   </style>
 </head>
 <body>
-  <h1>Live QR Code</h1>
-  <div id="qr-code-container"></div>
+  <h1>Claim Your Artwork</h1>
+  <div id="qr-code-container">Loading...</div>
 
-  <script type="module">
-    import QrCode from './qr-code.js';
-
+  <script src="qr-code.js"></script>
+  <script>
     const container = document.getElementById('qr-code-container');
 
-    function updateQrCode() {
-      const now = Math.floor(Date.now() / 1000);
-      const slot = Math.floor(now / 30);
-      const url = `https://example.com/${slot}`;
+    async function updateQrCode() {
+      try {
+        const res = await fetch('/claim-url');
+        const json = await res.json();
+        const url = json.url;
 
-      const matrix = QrCode.generate(url);
-      const svg = QrCode.render('svg', matrix);
-      container.innerHTML = svg;
+        const matrix = QrCode.generate(url);
+        let svg = QrCode.render("svg", matrix);
+        svg = svg.replace(
+          /<svg([^>]+)>/,
+          '<svg$1 width="100%" height="100%" preserveAspectRatio="xMidYMid meet">'
+        );
+        container.innerHTML = svg;
+      } catch (err) {
+        console.error("Error loading QR code:", err);
+        container.textContent = "Error loading QR code";
+      }
     }
 
     updateQrCode();
@@ -43,6 +52,7 @@
   </script>
 </body>
 </html>
+
 
 
 
