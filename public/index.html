@@ -1,1 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Dynamic QR Code</title>
+  <style>
+    #qr-container {
+      width: 300px;
+      margin: 50px auto;
+    }
+  </style>
+</head>
+<body>
+  <div id="qr-container">Loading QR code...</div>
+
+  <script src="qr-code.js"></script>
+
+  <script>
+    async function fetchClaimUrl() {
+      const res = await fetch('/claim-url');
+      const json = await res.json();
+      return json.url;
+    }
+
+    async function updateQrCode() {
+      try {
+        const url = await fetchClaimUrl();
+        const container = document.getElementById('qr-container');
+        container.innerHTML = '';
+
+        const qrcode = new QRCode(container, {
+          text: url,
+          width: 256,
+          height: 256
+        });
+      } catch (e) {
+        console.error('Error loading QR code:', e);
+        document.getElementById('qr-container').textContent = 'Error loading QR code';
+      }
+    }
+
+    updateQrCode();                   // Initial load
+    setInterval(updateQrCode, 30000); // Refresh every 30 seconds
+  </script>
+</body>
+</html>
+
 
