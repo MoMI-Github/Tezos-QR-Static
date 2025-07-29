@@ -1,50 +1,28 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Dynamic QR Code</title>
+  <meta charset="UTF-8" />
+  <title>QR Code Generator</title>
   <style>
-    #qr-container {
-      width: 300px;
-      margin: 50px auto;
-      text-align: center;
+    #qr {
+      margin-top: 20px;
     }
   </style>
 </head>
 <body>
-  <div id="qr-container">Loading QR code...</div>
+  <h1>QR Code Test</h1>
+  <div id="qr"></div>
 
-  <!-- QR code library -->
+  <!-- Include your custom QR code library -->
   <script src="qr-code.js"></script>
 
   <script>
-    async function fetchClaimUrl() {
-      const res = await fetch('/claim-url');
-      const json = await res.json();
-      return json.url;
-    }
-
-    async function updateQrCode() {
-      try {
-        const url = await fetchClaimUrl();
-        const container = document.getElementById('qr-container');
-        container.innerHTML = ''; // Clear existing QR
-
-        new QRCode(container, {
-          text: url,
-          width: 256,
-          height: 256
-        });
-      } catch (e) {
-        console.error('Error loading QR code:', e);
-        document.getElementById('qr-container').textContent = 'Error loading QR code';
-      }
-    }
-
-    updateQrCode(); // Initial QR code
-    setInterval(updateQrCode, 30000); // Refresh every 30 seconds
+    const matrix = QrCode.generate("https://example.com");
+    const svg = QrCode.render("svg", matrix);
+    document.getElementById("qr").innerHTML = svg;
   </script>
 </body>
 </html>
+
 
 
