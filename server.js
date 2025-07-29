@@ -2,12 +2,14 @@ const express = require('express');
 const fetch = require('node-fetch');
 const cors = require('cors');
 const path = require('path');
+
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-app.use(cors()); // enables CORS for all origins
+// Enable CORS for all origins (adjust as needed)
+app.use(cors());
 
-// Serve static files (like index.html, fonts, js, etc.)
+// Serve static files from the "public" folder
 const PUBLIC_PATH = path.join(__dirname, 'public');
 app.use(express.static(PUBLIC_PATH));
 
@@ -16,25 +18,33 @@ app.get('/', (req, res) => {
   res.sendFile(path.join(PUBLIC_PATH, 'index.html'));
 });
 
-// Proxy route for claim URL — returns the URL in JSON
+// Secure proxy route for claim URL (hides authKey from frontend)
 app.get('/claim-url', async (req, res) => {
   try {
-    const response = await fetch('https://api.prod.kanvas.trili.tech/claim-url?campaignId=momi-x-melissa-wiederrecht&authKey=fd58d25269079cec142af70a320a7597');
-    
+    const apiUrl = 'https://api.prod.kanvas.trili.tech/claim-url?campaignId=momi-x-melissa-wiederrecht&authKey=fd58d25269079cec142af70a320a7597';
+    const response = await fetch(apiUrl);
+
     if (!response.ok) {
-      return res.status(500).json({ error: 'Failed to fetch from Kanvas API' });
+      console.error(`Fetch error: ${response.status} ${response.statusText}`);
+      return res.status(502).json({ error: 'Failed to fetch claim URL' });
     }
 
-    const data = await response.json();
-    res.json({ url: data.url }); // ✅ Return the URL as JSON
-  } catch (e) {
-    console.error('Proxy error:', e);
-    res.status(500).json({ error: 'Proxy error' });
+    const json = await response.json();
+    if (!json.url) {
+      return res.status(500).json({ error: 'Malformed response from Kanvas API' });
+    }
+
+    res.json({ url: json.url });
+  } catch (err) {
+    console.error('Proxy error:', err);
+    res.status(500).json({ error: 'Server proxy error' });
   }
 });
 
+// Start the server
 app.listen(PORT, () => {
-  console.log(`Proxy server running on port ${PORT}`);
+  console.log(`✅ Server running at http://localhost:${PORT}`);
 });
+
 
 
