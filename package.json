@@ -8,6 +8,6 @@
     "cors": "^2.8.5"
   },
   "scripts": {
-    "start": "node sever.js"
+    "start": "node server.js"
   }
 }
