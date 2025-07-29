@@ -16,7 +16,7 @@ app.get('/', (req, res) => {
   res.sendFile(path.join(PUBLIC_PATH, 'index.html'));
 });
 
-// Proxy route for claim URL
+// Proxy route for claim URL — returns the URL in JSON
 app.get('/claim-url', async (req, res) => {
   try {
     const response = await fetch('https://api.prod.kanvas.trili.tech/claim-url?campaignId=momi-x-melissa-wiederrecht&authKey=fd58d25269079cec142af70a320a7597');
@@ -26,7 +26,7 @@ app.get('/claim-url', async (req, res) => {
     }
 
     const data = await response.json();
-    res.redirect(data.url); // Auto-redirect to Kanvas claim URL
+    res.json({ url: data.url }); // ✅ Return the URL as JSON
   } catch (e) {
     console.error('Proxy error:', e);
     res.status(500).json({ error: 'Proxy error' });
@@ -36,4 +36,5 @@ app.get('/claim-url', async (req, res) => {
 app.listen(PORT, () => {
   console.log(`Proxy server running on port ${PORT}`);
 });
+
 
