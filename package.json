@@ -9,6 +9,6 @@
     "cors": "^2.8.5"
   },
   "scripts": {
-    "start": "node app.js"
+    "start": "node sever.js"
   }
 }
