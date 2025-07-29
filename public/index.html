@@ -1,46 +1,48 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>QR Code Generator</title>
+  <meta charset="utf-8">
+  <title>Tezos QR Code</title>
   <style>
     body {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      background-color: #fff;
       font-family: sans-serif;
+      text-align: center;
+      background: #fff;
     }
-    #qr {
-      max-width: 90vmin;
+    #qrcode {
+      margin-top: 40px;
     }
   </style>
 </head>
 <body>
-  <div id="qr">Loading QR code…</div>
+  <h1>Claim your Tezos QR Code</h1>
+  <div id="qrcode">Loading QR Code...</div>
 
   <script src="qrgen.js"></script>
   <script>
     async function updateQrCode() {
       try {
         const response = await fetch('/claim-url', { redirect: 'manual' });
-        const location = response.headers.get('Location');
+        const url = response.url;
 
-        if (!location) throw new Error('No redirect location found');
+        const matrix = QrCode.generate(url, {
+          errorCorrectionLevel: QrCode.ErrorCorrectionLevel.M,
+          invert: false,
+        });
 
-        const matrix = QrCode.generate(location);
-        const svg = QrCode.render('svg', matrix);
-        document.getElementById('qr').innerHTML = svg;
+        const svg = QrCode.render('svg', matrix, {
+          moduleSize: 1,
+        });
+
+        document.getElementById('qrcode').innerHTML = svg;
       } catch (err) {
-        console.error('Error loading QR code:', err);
-        document.getElementById('qr').textContent = 'Error loading QR code';
+        console.error("Error loading QR code:", err);
+        document.getElementById('qrcode').textContent = "Failed to load QR code.";
       }
     }
 
-    updateQrCode(); // initial load
-    setInterval(updateQrCode, 30000); // refresh every 30s
+    updateQrCode();
+    setInterval(updateQrCode, 30 * 1000);
   </script>
 </body>
 </html>
